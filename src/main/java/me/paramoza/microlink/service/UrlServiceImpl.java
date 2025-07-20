@@ -6,7 +6,6 @@ import me.paramoza.microlink.data.DataAccessService;
 import me.paramoza.microlink.entity.UrlRedirect;
 import me.paramoza.microlink.data.UrlRepository;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -27,16 +26,10 @@ public class UrlServiceImpl implements UrlService {
 
     @Override
     public String getLongUrl(String shortened) throws ResponseStatusException, FileNotFoundException {
-//        UrlRedirect urlRedirect = urlRepository.findById(shortened).orElse(null);
-//        if (urlRedirect == null) {
-//            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Could not find redirect for " + shortened);
-//        }
-//        return urlRedirect.getRedirect();
+        UrlRedirect foundUrlRedirect = dataAccessService.getUrlRedirect(shortened);
+        log.info(foundUrlRedirect.toString());
 
-        UrlRedirect foundInRedis = dataAccessService.getUrlRedirect(shortened);
-        log.info(foundInRedis.toString());
-
-        return foundInRedis.getRedirect();
+        return foundUrlRedirect.getRedirect();
     }
 
     @Override
@@ -52,7 +45,7 @@ public class UrlServiceImpl implements UrlService {
                 .build();
 
         urlRepository.save(urlRedirect);
-        dataAccessService.setUrlRedirect(urlRedirect);
+        dataAccessService.writeUrlRedirectToCache(urlRedirect);
 
         return urlRedirect;
     }

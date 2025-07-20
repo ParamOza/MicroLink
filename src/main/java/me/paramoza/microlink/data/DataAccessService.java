@@ -21,7 +21,7 @@ public class DataAccessService {
     private static final String REDIS_KEY_PREFIX = "url_redirect_";
     private static final int REDIS_TTL_SECONDS = 60; // 1 minute TTL for cached redirects
 
-    public void setUrlRedirect(UrlRedirect urlRedirect) {
+    public void writeUrlRedirectToCache(UrlRedirect urlRedirect) {
         urlRedirectRedisTemplate.opsForValue().set(
                 REDIS_KEY_PREFIX + urlRedirect.getShortened(),
                 urlRedirect,
@@ -42,7 +42,7 @@ public class DataAccessService {
 
         if (foundInMongo != null) {
             log.info("Got record from MongoDB: {}, writing through to Redis", foundInMongo);
-            this.setUrlRedirect(foundInMongo);
+            this.writeUrlRedirectToCache(foundInMongo);
             return foundInMongo;
         }
 
